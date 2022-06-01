@@ -12,3 +12,5 @@
 1. `jdbc:h2:~/datajpa`
 2. `jdbc:h2:tcp://localhost/~/datajpa`
 
+# 쿼리 메소드 필터 조건
+[스프링 데이터 JPA 공식 문서](https://docs.spring.io/spring-data/jpa/docs/current/reference/html/#jpa.query-methods.query-creation)  
