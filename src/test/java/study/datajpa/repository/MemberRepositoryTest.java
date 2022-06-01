@@ -164,4 +164,19 @@ class MemberRepositoryTest {
 
 		// then
 	}
+
+	@Test
+	void returnType() {
+		// given
+		Member member1 = new Member("AAA", 10);
+		Member member2 = new Member("BBB", 20);
+		memberRepository.save(member1);
+		memberRepository.save(member2);
+
+		// when
+		List<Member> result = memberRepository.findListByUsername("AAA");
+		result.forEach(System.out::println);
+
+		// then
+	}
 }
