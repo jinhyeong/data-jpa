@@ -18,6 +18,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceUnitUtil;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -294,5 +295,22 @@ class MemberRepositoryTest {
 		}
 
 		// then
+	}
+
+	@Test
+	public void queryHint() throws Exception {
+		//given
+		Member member1 = new Member("member1", 10);
+		memberRepository.save(member1);
+		em.flush();
+		em.clear();
+
+//		Optional<Member> findMember = memberRepository.findById(member1.getId());
+//		findMember.get().setUsername("memeber2");
+
+		//when
+		Member member = memberRepository.findReadOnlyByUsername("member1");
+		member.setUsername("member2");
+		em.flush(); //Update Query 실행X
 	}
 }
