@@ -1,5 +1,6 @@
 package study.datajpa.repository;
 
+import org.hibernate.Hibernate;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -13,6 +14,8 @@ import study.datajpa.dto.MemberDto;
 import study.datajpa.entity.Member;
 import study.datajpa.entity.Team;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceUnitUtil;
 import java.util.Arrays;
 import java.util.List;
 
@@ -27,6 +30,9 @@ class MemberRepositoryTest {
 
 	@Autowired
 	private TeamRepository teamRepository;
+
+	@Autowired
+	private EntityManager em;
 
 	@Test
 	void test() {
@@ -146,7 +152,6 @@ class MemberRepositoryTest {
 		member1.setTeam(teamA);
 		memberRepository.save(member1);
 
-
 		// when
 		List<MemberDto> memberDto = memberRepository.findMemberDto();
 		memberDto.forEach(System.out::println);
@@ -202,8 +207,8 @@ class MemberRepositoryTest {
 		// then
 		List<Member> content = page.getContent();
 		long totalElements = page.getTotalElements();
-//		content.forEach(System.out::println);
-//		System.out.println("totalElements = " + totalElements);
+		//		content.forEach(System.out::println);
+		//		System.out.println("totalElements = " + totalElements);
 
 		assertThat(content.size()).isEqualTo(3);
 		assertThat(page.getTotalElements()).isEqualTo(5);
@@ -233,8 +238,8 @@ class MemberRepositoryTest {
 
 		// then
 		List<Member> content = page.getContent();
-//		content.forEach(System.out::println);
-//		System.out.println("totalElements = " + totalElements);
+		//		content.forEach(System.out::println);
+		//		System.out.println("totalElements = " + totalElements);
 
 		assertThat(content.size()).isEqualTo(2);
 		assertThat(page.getNumber()).isEqualTo(0);
@@ -254,5 +259,40 @@ class MemberRepositoryTest {
 		int resultCount = memberRepository.bulkAgePlus(20);
 		//then
 		assertThat(resultCount).isEqualTo(3);
+	}
+
+	@Test
+	public void findMemberLazy() {
+		// given
+		Team teamA = new Team("teamA");
+		Team teamB = new Team("teamB");
+		teamRepository.save(teamA);
+		teamRepository.save(teamB);
+
+		Member member1 = new Member("AAA", 10);
+		member1.setTeam(teamA);
+		Member member2 = new Member("BBB", 20);
+		member2.setTeam(teamB);
+
+		memberRepository.save(member1);
+		memberRepository.save(member2);
+
+		// when
+		em.flush();
+		em.clear();
+		//when
+//		List<Member> members = memberRepository.findAll();
+		List<Member> members = memberRepository.findMemberFetchJoin();
+		//then
+		for (Member member : members) {
+			member.getTeam().getName();
+			//Hibernate 기능으로 확인
+			Hibernate.isInitialized(member.getTeam());
+			//JPA 표준 방법으로 확인
+			PersistenceUnitUtil util = em.getEntityManagerFactory().getPersistenceUnitUtil();
+			util.isLoaded(member.getTeam());
+		}
+
+		// then
 	}
 }
