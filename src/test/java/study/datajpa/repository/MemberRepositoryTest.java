@@ -282,7 +282,7 @@ class MemberRepositoryTest {
 		em.flush();
 		em.clear();
 		//when
-//		List<Member> members = memberRepository.findAll();
+		//		List<Member> members = memberRepository.findAll();
 		List<Member> members = memberRepository.findMemberFetchJoin();
 		//then
 		for (Member member : members) {
@@ -305,8 +305,8 @@ class MemberRepositoryTest {
 		em.flush();
 		em.clear();
 
-//		Optional<Member> findMember = memberRepository.findById(member1.getId());
-//		findMember.get().setUsername("memeber2");
+		//		Optional<Member> findMember = memberRepository.findById(member1.getId());
+		//		findMember.get().setUsername("memeber2");
 
 		//when
 		Member member = memberRepository.findReadOnlyByUsername("member1");
@@ -322,5 +322,24 @@ class MemberRepositoryTest {
 		List<Member> memberCustom = memberRepository.findMemberCustom();
 
 		// then
+	}
+
+	@Test
+	public void JpaEventBaseEntity() throws Exception {
+		//given
+		Member member = new Member("member1");
+		memberRepository.save(member); //@PrePersist
+		Thread.sleep(100);
+		member.setUsername("member2");
+		em.flush(); //@PreUpdate
+		em.clear();
+		
+		//when
+		Member findMember = memberRepository.findById(member.getId()).get();
+
+		//then
+		System.out.println("findMember.createdDate = " + findMember.getCreatedDate());
+//		System.out.println("findMember.updatedDate = " + findMember.getUpdatedDate());
+		System.out.println("findMember.updatedDate = " + findMember.getLastModifiedDate());
 	}
 }
