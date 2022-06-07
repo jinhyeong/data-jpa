@@ -313,4 +313,14 @@ class MemberRepositoryTest {
 		member.setUsername("member2");
 		em.flush(); //Update Query 실행X
 	}
+
+	@Test
+	void findMemberCustom() {
+		// given
+
+		// when
+		List<Member> memberCustom = memberRepository.findMemberCustom();
+
+		// then
+	}
 }
